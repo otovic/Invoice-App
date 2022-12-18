@@ -11,19 +11,22 @@ def closeApp():
 #create root app (window)
 rootApp = tk.Tk()
 rootApp.title("Ottoshop")
-rootApp.geometry("300x310")
+rootApp.geometry("300x355")
 
 #change window icon
 icon = tk.PhotoImage(file='./content/logo.png')
 rootApp.wm_iconphoto(True, icon)
 
+#create each button on starting form
 ttk.Button(rootApp, text='Fakturisanje', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Bar Kodovi', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Etikete', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Firmu', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Proizvod', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
-ttk.Button(rootApp, text='Izadji', command=closeApp, width=20).pack(padx=30, pady=30)
+ttk.Button(rootApp, text='Izmeni Proizvod', command=closeApp, width=20).pack(padx=30, pady=10)
+ttk.Button(rootApp, text='Izadji', command=closeApp, width=10).pack(padx=30, pady=30)
 
+#initiate main form
 rootApp.mainloop()
 
 # import tkinter as tk
