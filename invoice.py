@@ -3,104 +3,112 @@ from tkinter import ttk
 from util import getData, getInvoices
 import time
 
-def renderInvoiceDialog(root):
-    invoiceDialog = tk.Toplevel(root)
-    #container frame for all other frames
-    container = tk.Frame(invoiceDialog)
-    container.pack()
+class invoiceDialog:
+    def __init__(self, root) -> None:
+        self.optionsCompanies = [x['Ime'] for x in getData('data/companies.txt')]
+        self.optionsReceivers = [x['Naziv'] for x in getData('./data/receivers.txt')]
+        self.invoiceNumber = str(int(getInvoices()) + 1)
+        self.lastInvoiceNum = str(int(getInvoices()) + 1)
+        self.invoiceYear = str(time.localtime().tm_year)
+        self.products = getData('./data/products.txt')
+        self.optionProducts = [x['Ime'] for x in self.products]
+        self.quantity = tk.StringVar()
+        self.quantity.set(0)
+        self.selectedproduct = tk.StringVar()
+        self.selectedproduct.set(self.optionProducts[0])
+        self.selectedProducts = []
+        self.existingLabels = []
+        self.invoiceWindow = tk.Toplevel(root)
+        self.invoiceWindow.title('Fakturisanje - Ottoshop')
+        self.container = tk.Frame(self.invoiceWindow)
+        self.container.pack()
+        self.companyFrame = tk.Frame(self.container)
+        self.companyFrame.pack(pady=10, fill='both', expand=True)
+        self.receiverFrame = tk.Frame(self.container)
+        self.receiverFrame.pack(pady=10,  fill='both', expand=True)
+        self.invoiceNumberFrame = tk.Frame(self.container)
+        self.invoiceNumberFrame.pack(pady=10,  fill='both', expand=True)
+        self.productFrame = tk.Frame(self.container)
+        self.productFrame.pack(pady=10, padx=10, fill='both', expand=True)
+        self.selectedProductsFrame = tk.Frame(self.container)
+        self.selectedProductsFrame.pack(pady=10, padx=22, fill='both', expand=True)
 
-    #getting companies data from text file
-    companies = getData('./data/companies.txt')
-    optionsCompanies = [x['Ime'] for x in companies]
-    selectedCompany = tk.StringVar(invoiceDialog)
-    selectedCompany.set(optionsCompanies[0])
+    def printData(self):
+        print(self.optionsCompanies)
 
-    #creating companies frame and generating dropdown list for it
-    companyFrame = tk.Frame(container)
-    companyFrame.pack(pady=10, fill='both', expand=True)
-    ttk.Label(companyFrame, text='Firma:').pack(padx=20, anchor='w')
-    companiesDropDown = tk.OptionMenu(companyFrame, selectedCompany, *optionsCompanies)
-    companiesDropDown.configure(width=30)
-    companiesDropDown.pack(padx=20, anchor="w")
+    def removeProduct():
+        print('petar')
 
-    #getting receivers data
-    receivers = getData('./data/receivers.txt')
-    optionsReceivers = [x['Naziv'] for x in receivers]
-    selectedReceiver = tk.StringVar(invoiceDialog)
-    selectedReceiver.set(optionsReceivers[0])
-
-    #creating companies frame and generating drop down list for it
-    receiverFrame = tk.Frame(container)
-    receiverFrame.pack(pady=10,  fill='both', expand=True)
-    ttk.Label(receiverFrame, text='Primalac:').pack(padx=20, anchor='w')
-    receiverDropDown = tk.OptionMenu(receiverFrame, selectedReceiver, *optionsReceivers)
-    receiverDropDown.configure(width=30)
-    receiverDropDown.pack(padx=20, anchor="w")
-
-    #creating invoice number frame and filling the field with last invoice number used
-    lastInvoiceNum = str(int(getInvoices()) + 1)
-    invoiceYear = str(time.localtime().tm_year)
-    invoiceNumber = tk.StringVar()
-    invoiceNumber.set(lastInvoiceNum + '-' + invoiceYear[-2:])
-    invoiceNumberFrame = tk.Frame(container)
-    invoiceNumberFrame.pack(pady=10,  fill='both', expand=True)
-    ttk.Label(invoiceNumberFrame, text='Broj Fakture:').pack(padx=20, anchor='w')
-    invoiceNumberEntry = tk.Entry(invoiceNumberFrame, textvariable=invoiceNumber)
-    invoiceNumberEntry.pack(pady=10, padx=22, fill='both', expand=True)
-
-    productFrame = tk.Frame(container)
-    productFrame.pack(pady=10, padx=20, fill='both', expand=True)
-
-    products = getData('./data/products.txt')
-    optionProducts = [x['Ime'] for x in products]
-    selectedproduct = tk.StringVar()
-    selectedproduct.set(optionProducts[0])
-
-    quantity = tk.StringVar()
-    quantity.set(0)
-
-    selectedProducts = []
-    existingLabels = []
-
-    def insertProduct():
-        if int(quantity.get()) != 0:
-            if any(x[0] == selectedproduct.get() for x in selectedProducts):
-                index = [i for i, sublist in enumerate(selectedProducts) for x in sublist if x == selectedproduct.get()]
-                selectedProducts[index[0]][1] += int(quantity.get())
-                insertProductInList(existingLabels)
-            else:
-                cena = next(int(x['Cena'].strip()) for x in products if x['Ime'] == selectedproduct.get())
-                product = [selectedproduct.get(), int(quantity.get()), cena]
-                selectedProducts.append(product)
-                existingLabels = insertProductInList(existingLabels)
-
-    productsDropDown = tk.OptionMenu(productFrame, selectedproduct, *optionProducts)
-    productsDropDown.configure(width=25)
-    productsDropDown.pack(side='left')
-    quantityEntry = tk.Entry(productFrame, textvariable=quantity, width=3)
-    quantityEntry.pack(side='left')
-    ttk.Button(productFrame, text="+", width=3, command=insertProduct).pack(side='left')
-
-    selectedProductsFrame = tk.Frame(container)
-    selectedProductsFrame.pack(pady=10, padx=20, fill='both', expand=True)
-
-    def insertProductInList(lbls):
-        for x, sublist in enumerate(lbls):
-            print(sublist[0])
+    def insertProductInList(self, selectedProductsFrame):
+        for x, sublist in enumerate(self.existingLabels):
+            print(self.existingLabels)
             sublist[0].pack_forget()
-            sublist[1].pack_forget()
-        lbls = []
-        for x in range(len(selectedProducts)):
-            lbl = ttk.Label(selectedProductsFrame, text=f"{x + 1}: {selectedProducts[x][0]} ({selectedProducts[x][2]}) x {selectedProducts[x][1]}")
-            lbl.grid(row=x, column=0)
-            btn = ttk.Button(selectedProductsFrame, text="X", width=1, command=lambda: on_click(x, lbls))
-            btn.grid(row=x, column=1)
-            lbls.append([lbl, btn])
-        return lbls
-    
-    def on_click(pos, arrlbl):
-        selectedProducts.pop(pos)
-        insertProductInList(existingLabels)
-        # for x, sublist in enumerate(existingLabels):
-        #     btn = sublist[1]
-        #     print(btn['text'])
+        self.existingLabels = []
+        for x in range(len(self.selectedProducts)):
+            frm = tk.Frame(self.selectedProductsFrame)
+            frm.pack(pady=10, padx=3, fill='both', expand=True)
+            lbl = ttk.Label(frm, text=f"{x + 1}: {self.selectedProducts[x][0]} ({self.selectedProducts[x][2]}) x {self.selectedProducts[x][1]}")
+            lbl.pack(side='left')
+            btn = ttk.Button(frm, text="X", width=1, command=lambda: self.removeProduct())
+            btn.pack(side='left')
+            self.existingLabels.append([frm])
+
+    def testy(self):
+        for i, sub in enumerate(self.products):
+            print(sub)
+            for y in sub:
+                print(y[0])
+                if y[0] == self.selectedproduct.get():
+                    print('AAAAAAAAAA')
+
+    def insertProduct(self, frame):
+        price = None
+        if int(self.quantity.get()) != 0:
+            if any(x[0] == self.selectedproduct.get() for x in self.selectedProducts):
+                index = [i for i, sublist in enumerate(self.products) if sublist['Ime'] == self.selectedproduct.get()]
+                print(index)
+                self.selectedProducts[index[0]][1] += int(self.quantity.get())
+                self.insertProductInList(frame)
+            else:
+                print(self.optionProducts)
+                price = next(int(x['Cena'].strip()) for x in self.products if x['Ime'] == self.selectedproduct.get())
+                product = [self.selectedproduct.get(), int(self.quantity.get()), price]
+                self.selectedProducts.append(product)
+                self.insertProductInList(frame)
+
+    def renderDialog(self):
+        #getting companies data from text file
+        selectedCompany = tk.StringVar(self.invoiceWindow)
+        selectedCompany.set(self.optionsCompanies[0])
+
+        #creating companies frame and generating dropdown list for it
+        ttk.Label(self.companyFrame, text='Firma:').pack(padx=20, anchor='w')
+        companiesDropDown = tk.OptionMenu(self.companyFrame, selectedCompany, *self.optionsCompanies)
+        companiesDropDown.configure(width=30)
+        companiesDropDown.pack(padx=20, anchor="w")
+
+        #getting receivers data
+        selectedReceiver = tk.StringVar(self.invoiceWindow)
+        selectedReceiver.set(self.optionsReceivers[0])
+
+        ttk.Label(self.receiverFrame, text='Primalac:').pack(padx=20, anchor='w')
+        receiverDropDown = tk.OptionMenu(self.receiverFrame, selectedReceiver, *self.optionsReceivers)
+        receiverDropDown.configure(width=30)
+        receiverDropDown.pack(padx=20, anchor="w")
+
+        invoiceNumberFrame = tk.Frame(self.container)
+        invoiceNumberFrame.pack(fill='both', expand=True)
+        #creating invoice number frame and filling the field with last invoice number used
+        invoiceNumberVar = tk.StringVar()
+        invoiceNumberVar.set(self.lastInvoiceNum + '-' + self.invoiceYear[-2:])
+
+        ttk.Label(self.invoiceNumberFrame, text='Broj Fakture:').pack(padx=20, anchor='w')
+        invoiceNumberEntry = tk.Entry(self.invoiceNumberFrame, textvariable=invoiceNumberVar)
+        invoiceNumberEntry.pack(pady=10, padx=22, fill='both', expand=True)
+
+        productsDropDown = tk.OptionMenu(self.productFrame, self.selectedproduct, *self.optionProducts)
+        productsDropDown.configure(width=22)
+        productsDropDown.pack(side='left')
+        quantityEntry = tk.Entry(self.productFrame, textvariable=self.quantity, width=3)
+        quantityEntry.pack(side='left')
+        ttk.Button(self.productFrame, text="+", width=3, command=lambda: self.insertProduct(self.selectedProductsFrame)).pack(side='left')
