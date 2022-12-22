@@ -8,6 +8,7 @@ def showInvoiceDialog():
     global invoiceDialogObj
     invoiceDialogObj = invoiceDialog(rootApp)
     invoiceDialogObj.renderDialog()
+    invoiceDialogObj.saveDocument()
 
 def closeApp():
     rootApp.quit()                                                               

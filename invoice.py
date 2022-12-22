@@ -3,9 +3,11 @@ from tkinter import ttk
 from util import getData, getInvoices
 import time
 import docx
+import datetime
 from tkinter import filedialog as fd
 from docx.table import Table
 from docx.shared import RGBColor, Pt
+from docx.enum.style import WD_STYLE_TYPE
 
 class invoiceDialog:
     def __init__(self, root) -> None:
@@ -44,36 +46,78 @@ class invoiceDialog:
         self.invoicePathFrame.pack(pady=10, padx=10, fill='both', expand=True)
         self.invoicePath = tk.StringVar()
         self.invoicePath.set(self.companiesData[0]['path'])
-        print(self.invoicePath.get())
 
     def saveDocument(self):
+        print(self.companiesData)
         # Create a new document
+        
         doc = docx.Document()
-        p = doc.add_paragraph()
-        p.paragraph_format.space_after = Pt(0)
+        table = doc.add_table(rows=6, cols=2)
 
-        runner = p.add_run("Petko")
+        titleP = doc.add_paragraph()
+        titleStyle = doc.styles
+        title_charstyle = titleStyle.add_style('TitleStyle', WD_STYLE_TYPE.CHARACTER)
+        title_charstyle.font.size = Pt(10)
+        title_charstyle.font.name = 'Calibri'
+        titleP.paragraph_format.space_after = Pt(0)
+
+        table = doc.add_table(rows=6, cols=2)
+        cell = table.cell(0, 2)
+
+        textStyle = doc.styles
+        text_charstyle = textStyle.add_style('TextStyle', WD_STYLE_TYPE.CHARACTER)
+        text_charstyle.font.size = Pt(12)
+        text_charstyle.font.name = 'Calibri'
+
+        runner = titleP.add_run(self.companiesData[0]['Ime'], style='TitleStyle')
         runner.bold = True
         runner.italic = True
         runner.font.size = Pt(20)
+        cell.add_paragraph('PETRICA')
 
-        p = doc.add_paragraph()
-
-        runner = p.add_run("Petko")
+        companyIDNum = doc.add_paragraph()
+        companyIDNum.paragraph_format.space_after = Pt(0)
+        runner = companyIDNum.add_run(f"Maticni broj: {self.companiesData[0]['Maticni']}", style ='TextStyle')
         runner.font.size = Pt(12)
 
-        p = doc.add_paragraph()
+        companyTaxNumber = doc.add_paragraph()
+        companyTaxNumber.paragraph_format.space_after = Pt(0)
+        runner = companyTaxNumber.add_run(f"PIB: {self.companiesData[0]['PIB']}", style ='TextStyle')
+        runner.font.size = Pt(12)
 
-        runner = p.add_run("Petko")
+        companyAdress = doc.add_paragraph()
+        companyAdress.paragraph_format.space_after = Pt(0)
+        runner = companyAdress.add_run(f"Adresa: {self.companiesData[0]['Adresa']}, {self.companiesData[0]['Grad']}", style ='TextStyle')
+        runner.font.size = Pt(12)
+
+        companyEmail = doc.add_paragraph()
+        companyEmail.paragraph_format.space_after = Pt(0)
+        runner = companyEmail.add_run(f"Email: {self.companiesData[0]['Email']}", style ='TextStyle')
+        runner.font.size = Pt(12)
+
+        date = datetime.datetime.now()
+        meseci = {
+            1: 'Januar',
+            2: 'Februar',
+            3: 'Mart',
+            4: 'April',
+            5: 'Maj',
+            6: 'Jun',
+            7: 'Jul',
+            8: 'Avgust',
+            9: 'Septembar',
+            10: 'Oktobar',
+            11: 'Novembar',
+            12: 'Decembar'
+        }
+
+        todaysDate = doc.add_paragraph()
+        todaysDate.paragraph_format.space_after = Pt(0)
+        runner = todaysDate.add_run(f"Datum: {date.day}-{meseci[date.month]}-{date.year}", style ='TextStyle')
         runner.font.size = Pt(12)
 
         # Save the document
         doc.save("table.docx")
-
-
-
-
-
 
     def updateCompanyData(self, company):
         self.companiesData = [x for x in getData('data/companies.txt') if x['Ime'] == company]
