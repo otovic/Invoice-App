@@ -22,3 +22,10 @@ def getInvoices() -> max([1, 2, 3]):
             for num in data:
                 numbers.append(num)
     return max(numbers)
+
+def getInvoicePath():
+    with open('data/invoicepath.txt', 'r') as fr:
+        data = fr.readlines()
+        
+
+getInvoicePath()
