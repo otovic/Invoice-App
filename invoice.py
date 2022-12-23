@@ -48,73 +48,104 @@ class invoiceDialog:
         self.invoicePath.set(self.companiesData[0]['path'])
 
     def saveDocument(self):
-        print(self.companiesData)
-        # Create a new document
+        def setTitleText(paragraph, run):
+            paragraph.paragraph_format.space_after = Pt(0)
+            run.font.bold = True
+            run.font.italic = True
+            run.font.size = Pt(20)
+            run.font.name = 'Calibri'
         
+        def setNormalText(paragraph, run):
+            paragraph.paragraph_format.space_before = Pt(5)
+            paragraph.alignment = docx.enum.text.WD_ALIGN_PARAGRAPH.RIGHT
+            run.font.size = Pt(12)
+            run.font.name = 'Calibri'
+
+        # Create a new document
         doc = docx.Document()
+
+        # Createing the table for word document header
         table = doc.add_table(rows=6, cols=2)
 
-        titleP = doc.add_paragraph()
-        titleStyle = doc.styles
-        title_charstyle = titleStyle.add_style('TitleStyle', WD_STYLE_TYPE.CHARACTER)
-        title_charstyle.font.size = Pt(10)
-        title_charstyle.font.name = 'Calibri'
-        titleP.paragraph_format.space_after = Pt(0)
+        # Set the top and bottom padding for all cells in the table
+        for row in table.rows:
+            for cell in row.cells:
+                cell.paragraphs[0].paragraph_format.space_before = 72
+                cell.paragraphs[0].paragraph_format.space_after = 72
+        
+        cell = table.cell(0, 0)
+        cell.text = self.companiesData[0]['Ime']
+        run = cell.paragraphs[0].runs[0]
+        setTitleText(cell.paragraphs[0], cell.paragraphs[0].runs[0])
 
-        table = doc.add_table(rows=6, cols=2)
-        cell = table.cell(0, 2)
+        cell = table.cell(0, 1)
+        cell.text = f"Broj fakture: {self.lastInvoiceNum}-{self.invoiceYear}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0])
 
-        textStyle = doc.styles
-        text_charstyle = textStyle.add_style('TextStyle', WD_STYLE_TYPE.CHARACTER)
-        text_charstyle.font.size = Pt(12)
-        text_charstyle.font.name = 'Calibri'
+        # titleP = doc.add_paragraph()
+        # titleStyle = doc.styles
+        # titleP.style = doc.styles['No Spacing']
+        # # title_charstyle = titleStyle.add_style('No Spacing', WD_STYLE_TYPE.CHARACTER)
+        # # title_charstyle.font.size = Pt(10)
+        # # title_charstyle.font.name = 'Calibri'
+        # titleP.paragraph_format.space_after = Pt(0)
 
-        runner = titleP.add_run(self.companiesData[0]['Ime'], style='TitleStyle')
-        runner.bold = True
-        runner.italic = True
-        runner.font.size = Pt(20)
-        cell.add_paragraph('PETRICA')
+        # table = doc.add_table(rows=6, cols=2)
+        # table.style = 'No Spacing'
+        # cell = table.cell(3, 1)
+        # cell.text = 'Petro'
 
-        companyIDNum = doc.add_paragraph()
-        companyIDNum.paragraph_format.space_after = Pt(0)
-        runner = companyIDNum.add_run(f"Maticni broj: {self.companiesData[0]['Maticni']}", style ='TextStyle')
-        runner.font.size = Pt(12)
+        # textStyle = doc.styles
+        # text_charstyle = textStyle.add_style('TextStyle', WD_STYLE_TYPE.CHARACTER)
+        # text_charstyle.font.size = Pt(12)
+        # text_charstyle.font.name = 'Calibri'
 
-        companyTaxNumber = doc.add_paragraph()
-        companyTaxNumber.paragraph_format.space_after = Pt(0)
-        runner = companyTaxNumber.add_run(f"PIB: {self.companiesData[0]['PIB']}", style ='TextStyle')
-        runner.font.size = Pt(12)
+        # runner = titleP.add_run(self.companiesData[0]['Ime'], style='TitleStyle')
+        # runner.bold = True
+        # runner.italic = True
+        # runner.font.size = Pt(20)
+        # cell.add_paragraph('PETRICA')
 
-        companyAdress = doc.add_paragraph()
-        companyAdress.paragraph_format.space_after = Pt(0)
-        runner = companyAdress.add_run(f"Adresa: {self.companiesData[0]['Adresa']}, {self.companiesData[0]['Grad']}", style ='TextStyle')
-        runner.font.size = Pt(12)
+        # companyIDNum = doc.add_paragraph()
+        # companyIDNum.paragraph_format.space_after = Pt(0)
+        # runner = companyIDNum.add_run(f"Maticni broj: {self.companiesData[0]['Maticni']}", style ='TextStyle')
+        # runner.font.size = Pt(12)
 
-        companyEmail = doc.add_paragraph()
-        companyEmail.paragraph_format.space_after = Pt(0)
-        runner = companyEmail.add_run(f"Email: {self.companiesData[0]['Email']}", style ='TextStyle')
-        runner.font.size = Pt(12)
+        # companyTaxNumber = doc.add_paragraph()
+        # companyTaxNumber.paragraph_format.space_after = Pt(0)
+        # runner = companyTaxNumber.add_run(f"PIB: {self.companiesData[0]['PIB']}", style ='TextStyle')
+        # runner.font.size = Pt(12)
 
-        date = datetime.datetime.now()
-        meseci = {
-            1: 'Januar',
-            2: 'Februar',
-            3: 'Mart',
-            4: 'April',
-            5: 'Maj',
-            6: 'Jun',
-            7: 'Jul',
-            8: 'Avgust',
-            9: 'Septembar',
-            10: 'Oktobar',
-            11: 'Novembar',
-            12: 'Decembar'
-        }
+        # companyAdress = doc.add_paragraph()
+        # companyAdress.paragraph_format.space_after = Pt(0)
+        # runner = companyAdress.add_run(f"Adresa: {self.companiesData[0]['Adresa']}, {self.companiesData[0]['Grad']}", style ='TextStyle')
+        # runner.font.size = Pt(12)
 
-        todaysDate = doc.add_paragraph()
-        todaysDate.paragraph_format.space_after = Pt(0)
-        runner = todaysDate.add_run(f"Datum: {date.day}-{meseci[date.month]}-{date.year}", style ='TextStyle')
-        runner.font.size = Pt(12)
+        # companyEmail = doc.add_paragraph()
+        # companyEmail.paragraph_format.space_after = Pt(0)
+        # runner = companyEmail.add_run(f"Email: {self.companiesData[0]['Email']}", style ='TextStyle')
+        # runner.font.size = Pt(12)
+
+        # date = datetime.datetime.now()
+        # meseci = {
+        #     1: 'Januar',
+        #     2: 'Februar',
+        #     3: 'Mart',
+        #     4: 'April',
+        #     5: 'Maj',
+        #     6: 'Jun',
+        #     7: 'Jul',
+        #     8: 'Avgust',
+        #     9: 'Septembar',
+        #     10: 'Oktobar',
+        #     11: 'Novembar',
+        #     12: 'Decembar'
+        # }
+
+        # todaysDate = doc.add_paragraph()
+        # todaysDate.paragraph_format.space_after = Pt(0)
+        # runner = todaysDate.add_run(f"Datum: {date.day}-{meseci[date.month]}-{date.year}", style ='TextStyle')
+        # runner.font.size = Pt(12)
 
         # Save the document
         doc.save("table.docx")
