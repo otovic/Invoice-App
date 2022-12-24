@@ -6,7 +6,7 @@ def getData(fileName) -> [{}]:
             data = data.split(':')
             receiver = dict()
             for key in data:
-                currentKey = key.split('/')
+                currentKey = key.split('|')
                 receiver.setdefault(currentKey[0], currentKey[1])
             dataArray.append(receiver)
         return dataArray
@@ -26,6 +26,3 @@ def getInvoices() -> max([1, 2, 3]):
 def getInvoicePath():
     with open('data/invoicepath.txt', 'r') as fr:
         data = fr.readlines()
-        
-
-getInvoicePath()

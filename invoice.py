@@ -3,10 +3,11 @@ from tkinter import ttk
 from util import getData, getInvoices
 import time
 import docx
-import datetime
+import datetime as dt
+from datetime import datetime, timedelta
 from tkinter import filedialog as fd
 from docx.table import Table
-from docx.shared import RGBColor, Pt
+from docx.shared import RGBColor, Pt, Inches
 from docx.enum.style import WD_STYLE_TYPE
 
 class invoiceDialog:
@@ -17,6 +18,7 @@ class invoiceDialog:
         self.companiesData = [x for x in getData('data/companies.txt') if x['Ime'] == self.selectedCompany.get()]
         self.selectedCompany.set(self.optionsCompanies[0])
         self.optionsReceivers = [x['Naziv'] for x in getData('./data/receivers.txt')]
+        self.selectedReceiver = tk.StringVar()
         self.invoiceNumber = str(int(getInvoices()) + 1)
         self.lastInvoiceNum = str(int(getInvoices()) + 1)
         self.invoiceYear = str(time.localtime().tm_year)
@@ -55,11 +57,38 @@ class invoiceDialog:
             run.font.size = Pt(20)
             run.font.name = 'Calibri'
         
-        def setNormalText(paragraph, run):
-            paragraph.paragraph_format.space_before = Pt(5)
-            paragraph.alignment = docx.enum.text.WD_ALIGN_PARAGRAPH.RIGHT
+        def setNormalText(paragraph, run, spaceBefore, spaceAfter, align):
+            paragraph.paragraph_format.space_before = Pt(spaceBefore)
+            paragraph.paragraph_format.space_after = Pt(spaceAfter)
+            match align:
+                case 'left':
+                    paragraph.alignment = docx.enum.text.WD_ALIGN_PARAGRAPH.LEFT
+                case 'right':
+                    paragraph.alignment = docx.enum.text.WD_ALIGN_PARAGRAPH.RIGHT
+                case 'center':
+                    paragraph.alignment = docx.enum.text.WD_ALIGN_PARAGRAPH.CENTER   
             run.font.size = Pt(12)
             run.font.name = 'Calibri'
+
+        def getCurrentDate():
+            meseci = {
+                1: 'Januar',
+                2: 'Februar',
+                3: 'Mart',
+                4: 'April',
+                5: 'Maj',
+                6: 'Jun',
+                7: 'Jul',
+                8: 'Avgust',
+                9: 'Septembar',
+                10: 'Oktobar',
+                11: 'Novembar',
+                12: 'Decembar'
+            }
+            date = datetime.now()
+            consDate = datetime(date.year, date.month, date.day)
+            res = consDate + timedelta(days=30)
+            return f"{date.day}-{meseci[date.month]}-{date.year}", f"{res.day}-{meseci[res.month]}-{res.year}"
 
         # Create a new document
         doc = docx.Document()
@@ -73,14 +102,145 @@ class invoiceDialog:
                 cell.paragraphs[0].paragraph_format.space_before = 72
                 cell.paragraphs[0].paragraph_format.space_after = 72
         
+        #set the name of the company
         cell = table.cell(0, 0)
         cell.text = self.companiesData[0]['Ime']
         run = cell.paragraphs[0].runs[0]
         setTitleText(cell.paragraphs[0], cell.paragraphs[0].runs[0])
 
-        cell = table.cell(0, 1)
+        #set the invoice number
+        cell = table.cell(1, 1)
         cell.text = f"Broj fakture: {self.lastInvoiceNum}-{self.invoiceYear}"
-        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0])
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'right')
+
+        #setting the company id number
+        cell = table.cell(1, 0)
+        cell.text = f"Maticni broj: {self.companiesData[0]['Maticni']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #set invoice date
+        cell = table.cell(2, 1)
+        currentDate, dateDue = getCurrentDate() 
+        cell.text = f"Datum prometa: {currentDate}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'right')
+        cell = table.cell(3, 1)
+        currentDate, dateDue = getCurrentDate() 
+        cell.text = f"Rok placanja: {dateDue}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'right')
+
+        #setting company tax number
+        cell = table.cell(2, 0)
+        cell.text = f"PIB: {self.companiesData[0]['PIB']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #setting the company type id
+        cell = table.cell(3, 0)
+        cell.text = f"Sifra delatnosti: {self.companiesData[0]['Delatnost']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #setting the company adress
+        cell = table.cell(4, 0)
+        cell.text = f"Adresa: {self.companiesData[0]['Adresa']}, {self.companiesData[0]['Grad']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #setting the company email
+        cell = table.cell(5, 0)
+        cell.text = f"Email: {self.companiesData[0]['Email']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #setting the company bank account number
+        cell = table.cell(4, 1)
+        cell.text = f"Racun: {self.companiesData[0]['Account'].strip()}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'right')
+
+        # Createing the table for word document header
+        para = doc.add_paragraph("")
+        para.paragraph_format.space_before = 10
+
+        table = doc.add_table(rows=5, cols=1)
+
+        # Set the top and bottom padding for all cells in the table
+        for row in table.rows:
+            for cell in row.cells:
+                cell.paragraphs[0].paragraph_format.space_before = 72
+                cell.paragraphs[0].paragraph_format.space_after = 72
+
+        #getting receivers data
+        receiver = next(x for x in getData("data/receivers.txt") if x['Naziv'] == self.selectedReceiver.get())     
+
+        #add receiver title
+        cell = table.cell(0, 0)
+        cell.text = "ZA:"
+        setTitleText(cell.paragraphs[0], cell.paragraphs[0].runs[0])
+
+        #set receiver name
+        cell = table.cell(1, 0)
+        cell.text = f"Ime: {receiver['Ime']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #set receiver name
+        cell = table.cell(2, 0)
+        cell.text = f"Maticni broj: {receiver['Maticni']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #set receiver tax number
+        cell = table.cell(3, 0)
+        cell.text = f"PIB: {receiver['PIB']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        #set receiver Adress
+        cell = table.cell(4, 0)
+        cell.text = f"Adresa: {receiver['Grad']}, {receiver['Ulica']}"
+        setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        print(len(self.selectedProducts))
+        
+        table = doc.add_table(rows=1, cols=1)
+
+        # Set the top and bottom padding for all cells in the table
+        for row in table.rows:
+            for cell in row.cells:
+                cell.paragraphs[0].paragraph_format.space_before = 72
+                cell.paragraphs[0].paragraph_format.space_after = 72
+        
+        table.style = 'Light Grid'
+        
+        values = {
+            0: 'RB',
+            1: 'Artikal',
+            2: 'Kolicina',
+            3: 'Cena',
+            4: 'Ukupno'
+        }
+
+        width = {
+            0: 0.3,
+            1: 1,
+            2: 0.5,
+            3: 0.5,
+            4: 0.5
+        }
+
+        cell = table.rows[0].cells[0]
+        cell.paragraphs[0].text = 'test'
+        cell.width = Inches(4)
+        # setNormalText(para, para.runs[0], 0, 0, 'left')
+
+        # for x in range(len(self.selectedProducts) + 2):
+        #     for y in range(5):
+        #         if y == 0:
+        #             pass
+        #         else:
+        #             for t in self.selectedProducts:
+    
+        # setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left')
+
+        # for x in self.selectedProducts:
+        #     for y in range(len(self.selectedProducts)):
+        #         cell = table.cell(y, 0)
+        #         ce
+
+
 
         # titleP = doc.add_paragraph()
         # titleStyle = doc.styles
@@ -126,7 +286,7 @@ class invoiceDialog:
         # runner = companyEmail.add_run(f"Email: {self.companiesData[0]['Email']}", style ='TextStyle')
         # runner.font.size = Pt(12)
 
-        # date = datetime.datetime.now()
+        # date = datetime.now()
         # meseci = {
         #     1: 'Januar',
         #     2: 'Februar',
@@ -196,11 +356,10 @@ class invoiceDialog:
         companiesDropDown.pack(padx=20, anchor="w")
 
         #getting receivers data
-        selectedReceiver = tk.StringVar(self.invoiceWindow)
-        selectedReceiver.set(self.optionsReceivers[0])
+        self.selectedReceiver.set(self.optionsReceivers[0])
 
         ttk.Label(self.receiverFrame, text='Primalac:').pack(padx=20, anchor='w')
-        receiverDropDown = tk.OptionMenu(self.receiverFrame, selectedReceiver, *self.optionsReceivers)
+        receiverDropDown = tk.OptionMenu(self.receiverFrame, self.selectedReceiver, *self.optionsReceivers)
         receiverDropDown.configure(width=30)
         receiverDropDown.pack(padx=20, anchor="w")
 
