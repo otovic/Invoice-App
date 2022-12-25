@@ -1,22 +1,18 @@
 import os
-import sys
 import tkinter as tk
 from tkinter import ttk
-from util import readData, getNextInvoiceNumber, updateCompanyinfo
+from util import readData, getNextInvoiceNumber, updateCompanyinfo, updateFinancialData
 import time
 import docx
 from datetime import datetime, timedelta
 from tkinter import filedialog as fd
 from docx.shared import Pt, Inches
 import random
-from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
-from PyQt5.QtWidgets import QApplication
 
 class invoiceDialog:
     def __init__(self, root) -> None:
         #information about all companies that are added
         self.companiesData = readData('data/companies.pickle')
-        print(self.companiesData)
         #only names of the companies that are used for drop down list
         self.CompaniesDDOptions = [x['Ime'] for x in self.companiesData]
         #information about all receivers that are added
@@ -261,11 +257,11 @@ class invoiceDialog:
                     cell1.merge(cell3)
                     cell1.merge(cell4)
                     cell1.text = 'UKUPNO ZA NAPLATU'
-                    sum = 0
+                    totalPrice = 0
                     for product in self.selectedProducts:
-                        sum += product[1] * product[2] 
+                        totalPrice += product[1] * product[2] 
                     setNormalText(cell1.paragraphs[0], cell1.paragraphs[0].runs[0], 5, 5, 'right', 13, True)
-                    cell5.text = f'{sum:,.2f} RSD'.replace(',', ' ')
+                    cell5.text = f'{totalPrice:,.2f} RSD'.replace(',', ' ')
                     setNormalText(cell5.paragraphs[0], cell5.paragraphs[0].runs[0], 5, 5, 'center', 13, True)
                 elif x == 0:
                     for y in range(5):
@@ -305,9 +301,11 @@ class invoiceDialog:
             try:
                 if self.invoicePath.get() != self.selectedCompanyInfo['Path']:
                     self.companiesData[index]['Path'] = self.invoicePath.get()
+
                 re = self.invoiceNumberVar.get().split('-')[0]
                 self.companiesData[index]['Invoices'] += f',{re}'
                 updateCompanyinfo(self.companiesData)
+
                 if os.path.exists(f"data/printedReceipts/{companyName}-{receiverName}-{invoiceDate}.docx"):
                     doc.save(f"data/printedReceipts/{companyName}-{receiverName}-{invoiceDate}({random.randint(0, 1000)}).docx")
                 else:
@@ -319,8 +317,35 @@ class invoiceDialog:
                 else:
                     doc.save(f"{self.invoicePath.get()}/{companyName}-{receiverName}-{invoiceDate}.docx")
                     path = f"{self.invoicePath.get()}/{companyName}-{receiverName}-{invoiceDate}.docx"
+
             except Exception as err:
                 print(err)
+
+            finances = {
+                    1: [],
+                    2: [],
+                    3: [],
+                    4: [],
+                    5: [],
+                    6: [],
+                    7: [],
+                    8: [],
+                    9: [],
+                    10: [],
+                    11: [],
+                    12: [],
+                }
+            ss = []
+            for x in self.selectedProducts:
+                ss.append(x[1] * x[2])
+            total = sum(ss)
+            print(total)
+
+            data = readData('data/financialdata.ottoshop')
+            data.setdefault(self.invoiceYear, finances)
+            data[self.invoiceYear][datetime.now().month].append(total)
+            print(data)
+            updateFinancialData(data)
 
             from docx2pdf import convert
             # Convert the docx document to a PDF file
@@ -333,9 +358,8 @@ class invoiceDialog:
     def updateCompanyData(self, company):
         self.selectedCompanyInfo = next(x for x in self.companiesData if x['Ime'] == company)
         self.lastInvoiceNum= str(int(getNextInvoiceNumber(self.selectedCompanyInfo['Invoices'])))
-        print(self.lastInvoiceNum)
         self.invoiceNumberVar.set(self.invoiceNumber + '-' + self.invoiceYear[-2:])
-    
+
     def updateReceiverData(self, receiver):
         self.selectedReceiverInfo = next(x for x in self.receiversData if x['Naziv'] == receiver)
 
