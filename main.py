@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 from tkinter import ttk
 from invoice import invoiceDialog
@@ -8,7 +9,6 @@ def showInvoiceDialog():
     global invoiceDialogObj
     invoiceDialogObj = invoiceDialog(rootApp)
     invoiceDialogObj.renderDialog()
-    invoiceDialogObj.saveDocument()
 
 def closeApp():
     rootApp.quit()                                                               
