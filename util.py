@@ -17,12 +17,26 @@
 import pickle
 
 def getNextInvoiceNumber(invoicenums) -> max([1, 2, 3]):
-    invoicenums = [int(x) for x in invoicenums.split(',')]
-    return(max(invoicenums) + 1)
+    invoicenums = [int(x) for x in invoicenums]
+    return (max(invoicenums) + 1) if len(invoicenums) > 0 else 1
 
 def readData(filename):
     with open(filename, 'rb') as frb:
-        return pickle.load(frb)
+       return pickle.load(frb)
+
+readData('data/financialdata.ottoshop')
+companies = [{
+    'Ime': 'OTTO-DIVISION',
+    'Maticni': '64807234',
+    'Adresa': 'Stevana Sremca 19/32',
+    'Grad': 'Nis',
+    'Email': 'ottosrbija@gmail.com',
+    'Delatnost': '1413',
+    'PIB': '110319347',
+    'Path': '',
+    'Account': '200-2910030101002-39',
+    'Invoices': {2022: []}
+}]
 
 def updateCompanyinfo(data):
     with open('data/companies.pickle', 'wb') as fwb:
@@ -32,20 +46,7 @@ def updateFinancialData(data):
     with open('data/financialdata.ottoshop', 'wb') as fwb:
         pickle.dump(data, fwb)
 finances = {
-    '2022': {
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-        7: [],
-        8: [],
-        9: [],
-        10: [],
-        11: [],
-        12: [],
-    }
+    
 }
 
 def writeCompanyPath(data):

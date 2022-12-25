@@ -14,6 +14,14 @@ def showInvoiceDialog():
     invoiceDialogObj = invoiceDialog(rootApp)
     invoiceDialogObj.renderDialog()
 
+financialDialogObj = None
+
+def showFinancialDialog():
+    from financialreport import FinancialDialog
+    global financialDialogObj
+    financialDialogObj = FinancialDialog(rootApp)
+    financialDialogObj.showDialog()
+
 def closeApp():
     rootApp.quit()                                                               
 #change window icon
@@ -21,7 +29,7 @@ icon = tk.PhotoImage(file='./content/logo.png')
 rootApp.wm_iconphoto(True, icon)
 # #create each button on starting form
 ttk.Button(rootApp, text='Fakturisanje', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
-ttk.Button(rootApp, text='Finansijski Izvestaj', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
+ttk.Button(rootApp, text='Finansijski Izvestaj', command=showFinancialDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Bar Kodovi', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Etikete', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Firmu', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)

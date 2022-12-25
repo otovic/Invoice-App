@@ -20,7 +20,9 @@ class invoiceDialog:
         #only receivers names that will be used for dropdown list
         self.receiversDDOptions = [x['Naziv'] for x in self.receiversData]
         #invoice number
-        self.invoiceNumber = str(getNextInvoiceNumber(self.companiesData[0]['Invoices']))
+        if datetime.now().year not in self.companiesData[0]['Invoices']:
+            self.companiesData[0]['Invoices'].setdefault(datetime.now().year, [])
+        self.invoiceNumber = str(getNextInvoiceNumber(self.companiesData[0]['Invoices'][datetime.now().year]))
         #current year
         self.invoiceYear = str(time.localtime().tm_year)
         #information about all available products
@@ -302,8 +304,8 @@ class invoiceDialog:
                 if self.invoicePath.get() != self.selectedCompanyInfo['Path']:
                     self.companiesData[index]['Path'] = self.invoicePath.get()
 
-                re = self.invoiceNumberVar.get().split('-')[0]
-                self.companiesData[index]['Invoices'] += f',{re}'
+                self.companiesData[index]['Invoices'].setdefault(datetime.now().year, [])
+                self.companiesData[index]['Invoices'][datetime.now().year].append(self.invoiceNumberVar.get().split('-')[0])
                 updateCompanyinfo(self.companiesData)
 
                 if os.path.exists(f"data/printedReceipts/{companyName}-{receiverName}-{invoiceDate}.docx"):
@@ -322,6 +324,8 @@ class invoiceDialog:
                 print(err)
 
             finances = {
+                datetime.now().year:
+                {
                     1: [],
                     2: [],
                     3: [],
@@ -333,22 +337,38 @@ class invoiceDialog:
                     9: [],
                     10: [],
                     11: [],
-                    12: [],
+                    12: []
                 }
+                }
+            months = {
+                1: [],
+                    2: [],
+                    3: [],
+                    4: [],
+                    5: [],
+                    6: [],
+                    7: [],
+                    8: [],
+                    9: [],
+                    10: [],
+                    11: [],
+                    12: []
+            }
             ss = []
             for x in self.selectedProducts:
                 ss.append(x[1] * x[2])
             total = sum(ss)
-            print(total)
 
             data = readData('data/financialdata.ottoshop')
-            data.setdefault(self.invoiceYear, finances)
-            data[self.invoiceYear][datetime.now().month].append(total)
-            print(data)
+            data.setdefault(self.selectedCompanyName.get(), finances)
+            if datetime.now().year not in data[self.selectedCompanyName.get()]:
+                data[self.selectedCompanyName.get()].setdefault(datetime.now().year, months)
+            data[self.selectedCompanyName.get()][datetime.now().year][datetime.now().month].append(total)
             updateFinancialData(data)
 
             from docx2pdf import convert
             # Convert the docx document to a PDF file
+            print(path)
             convert(path, 'data/printedReceipts/document.pdf')
 
             # Open the PDF file with the default PDF viewer
@@ -357,7 +377,7 @@ class invoiceDialog:
 
     def updateCompanyData(self, company):
         self.selectedCompanyInfo = next(x for x in self.companiesData if x['Ime'] == company)
-        self.lastInvoiceNum= str(int(getNextInvoiceNumber(self.selectedCompanyInfo['Invoices'])))
+        self.lastInvoiceNum= str(int(getNextInvoiceNumber(self.selectedCompanyInfo['Invoices'][datetime.now().year])))
         self.invoiceNumberVar.set(self.invoiceNumber + '-' + self.invoiceYear[-2:])
 
     def updateReceiverData(self, receiver):

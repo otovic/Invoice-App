@@ -23,18 +23,18 @@
 
 # import pickle
 
-# companies = [{
-#     'Ime': 'OTTO-DIVISION',
-#     'Maticni': '64807234',
-#     'Adresa': 'Stevana Sremca 19/32',
-#     'Grad': 'Nis',
-#     'Email': 'ottosrbija@gmail.com',
-#     'Delatnost': '1413',
-#     'PIB': '110319347',
-#     'Path': '',
-#     'Account': '200-2910030101002-39',
-#     'Invoices': '1,2,3'
-# }]
+companies = [{
+    'Ime': 'OTTO-DIVISION',
+    'Maticni': '64807234',
+    'Adresa': 'Stevana Sremca 19/32',
+    'Grad': 'Nis',
+    'Email': 'ottosrbija@gmail.com',
+    'Delatnost': '1413',
+    'PIB': '110319347',
+    'Path': '',
+    'Account': '200-2910030101002-39',
+    'Invoices': {'2022': []}
+}]
 
 # receivers = [{
 #     'Naziv': '011',
