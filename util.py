@@ -18,7 +18,7 @@ import pickle
 
 def getNextInvoiceNumber(invoicenums) -> max([1, 2, 3]):
     invoicenums = [int(x) for x in invoicenums]
-    return (max(invoicenums) + 1) if len(invoicenums) > 0 else 1
+    return invoicenums[len(invoicenums) - 1] + 1
 
 def readData(filename):
     with open(filename, 'rb') as frb:
@@ -48,6 +48,10 @@ def updateFinancialData(data):
 finances = {
     
 }
+
+def updateData(fileName: str, data):
+    with open(fileName, 'wb') as fwb:
+        pickle.dump(data, fwb)
 
 def writeCompanyPath(data):
     allcompanies = getData('data/companies.txt')

@@ -56,7 +56,6 @@ class FinancialDialog():
 
     def updateSelectedYear(self, year):
         self.selectedYear.set(year)
-        print(f"{year} +    pet")
         self.totalRevenue = sum([sum(x) for x in self.financialData[self.selectedCompany.get()][int(self.selectedYear.get())].values()])
         self.totalRevenue = f'{self.totalRevenue:,.2f} RSD'.replace(',', ' ')
         self.lbl.configure(text=f"Ukupan promet: {self.totalRevenue}")
