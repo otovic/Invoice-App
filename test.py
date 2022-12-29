@@ -36,6 +36,15 @@ companies = [{
     'Invoices': {'2022': []}
 }]
 
+import pickle
+
+# with open('data/products.pickle', 'rb') as rb:
+#     a = pickle.load(rb)
+#     a.pop(len(a) - 1)
+
+# with open('data/products.pickle', 'wb') as rb:
+#     pickle.dump(a, rb)
+
 # receivers = [{
 #     'Naziv': '011',
 #     'Ime': 'SOUVENIR SHOP',
