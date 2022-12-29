@@ -41,8 +41,8 @@ class invoiceDialog:
         self.companyFrame.pack(pady=10, fill='both', expand=True)
         self.receiverFrame = tk.Frame(self.container)
         self.receiverFrame.pack(pady=10,  fill='both', expand=True)
-        self.invoiceNumberFrame = tk.Frame(self.container)
-        self.invoiceNumberFrame.pack(pady=10,  fill='both', expand=True)
+        self.invoiceNumberberFrame = tk.Frame(self.container)
+        self.invoiceNumberberFrame.pack(pady=10,  fill='both', expand=True)
         self.productFrame = tk.Frame(self.container)
         self.productFrame.pack(pady=10, padx=15, fill='both', expand=True)
         self.selectedProductsFrame = tk.Frame(self.container)
@@ -70,8 +70,11 @@ class invoiceDialog:
         self.invoicePath = tk.StringVar()
         self.invoicePath.set(self.companiesData[0]['Path'])
         #tk string variable for invoiceNumber
-        self.invoiceNumberVar = tk.StringVar()
-        self.invoiceNumberVar.set(self.invoiceNumber + '-' + self.invoiceYear[-2:])
+        self.invoiceNumberberVar = tk.StringVar()
+        self.invoiceNumberberVar.set(self.invoiceNumber + '-' + self.invoiceYear[-2:])
+
+    def __del__(self):
+        print('destroy')
 
     def saveDocument(self):
         if self.invoicePath.get() != 'none' and len(self.selectedProducts) != 0:
@@ -128,6 +131,7 @@ class invoiceDialog:
                 }
                 return productInfo
             # Create a new document
+            self.invoiceNumber = self.invoiceNumberberVar.get().split('-')[0]
             doc = docx.Document()
 
             # Createing the table for word document header
@@ -141,8 +145,7 @@ class invoiceDialog:
             
             #set the name of the company
             cell = table.cell(0, 0)
-            cell.text = self.companiesData[0]['Ime']
-            run = cell.paragraphs[0].runs[0]
+            cell.text = self.selectedCompanyInfo['Ime']
             setTitleText(cell.paragraphs[0], cell.paragraphs[0].runs[0])
 
             #set the invoice number
@@ -152,7 +155,7 @@ class invoiceDialog:
 
             #setting the company id number
             cell = table.cell(1, 0)
-            cell.text = f"Maticni broj: {self.companiesData[0]['Maticni']}"
+            cell.text = f"Maticni broj: {self.selectedCompanyInfo['Maticni']}"
             setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left', 12, False)
 
             #set invoice date
@@ -167,27 +170,27 @@ class invoiceDialog:
 
             #setting company tax number
             cell = table.cell(2, 0)
-            cell.text = f"PIB: {self.companiesData[0]['PIB']}"
+            cell.text = f"PIB: {self.selectedCompanyInfo['PIB']}"
             setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left', 12, False)
 
             #setting the company type id
             cell = table.cell(3, 0)
-            cell.text = f"Sifra delatnosti: {self.companiesData[0]['Delatnost']}"
+            cell.text = f"Sifra delatnosti: {self.selectedCompanyInfo['Delatnost']}"
             setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left', 12, False)
 
             #setting the company adress
             cell = table.cell(4, 0)
-            cell.text = f"Adresa: {self.companiesData[0]['Adresa']}, {self.companiesData[0]['Grad']}"
+            cell.text = f"Adresa: {self.selectedCompanyInfo['Adresa']}, {self.selectedCompanyInfo['Grad']}"
             setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left', 12, False)
 
             #setting the company email
             cell = table.cell(5, 0)
-            cell.text = f"Email: {self.companiesData[0]['Email']}"
+            cell.text = f"Email: {self.selectedCompanyInfo['Email']}"
             setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'left', 12, False)
 
             #setting the company bank account number
             cell = table.cell(4, 1)
-            cell.text = f"Racun: {self.companiesData[0]['Account'].strip()}"
+            cell.text = f"Racun: {self.selectedCompanyInfo['Account'].strip()}"
             setNormalText(cell.paragraphs[0], cell.paragraphs[0].runs[0], 0, 0, 'right', 12, False)
 
             # Createing the table for word document header
@@ -305,7 +308,7 @@ class invoiceDialog:
                     self.companiesData[index]['Path'] = self.invoicePath.get()
 
                 self.companiesData[index]['Invoices'].setdefault(datetime.now().year, [])
-                self.companiesData[index]['Invoices'][datetime.now().year].append(self.invoiceNumberVar.get().split('-')[0])
+                self.companiesData[index]['Invoices'][datetime.now().year].append(self.invoiceNumberberVar.get().split('-')[0])
                 updateCompanyinfo(self.companiesData)
 
                 if os.path.exists(f"data/printedReceipts/{companyName}-{receiverName}-{invoiceDate}.docx"):
@@ -339,7 +342,8 @@ class invoiceDialog:
                     11: [],
                     12: []
                 }
-                }
+            }
+
             months = {
                 1: [],
                     2: [],
@@ -361,24 +365,32 @@ class invoiceDialog:
 
             data = readData('data/financialdata.ottoshop')
             data.setdefault(self.selectedCompanyName.get(), finances)
+
             if datetime.now().year not in data[self.selectedCompanyName.get()]:
                 data[self.selectedCompanyName.get()].setdefault(datetime.now().year, months)
+
             data[self.selectedCompanyName.get()][datetime.now().year][datetime.now().month].append(total)
             updateFinancialData(data)
 
             from docx2pdf import convert
             # Convert the docx document to a PDF file
-            print(path)
             convert(path, 'data/printedReceipts/document.pdf')
+            pdfPath = __file__.replace('invoice.py', 'data\printedReceipts\document.pdf')
+            print(pdfPath)
 
             # Open the PDF file with the default PDF viewer
-            os.startfile(path, 'print')
+            os.system(f'start {pdfPath}')
+            # os.startfile(pdfPath, 'print')
             self.invoiceWindow.destroy()
+            del self
 
     def updateCompanyData(self, company):
         self.selectedCompanyInfo = next(x for x in self.companiesData if x['Ime'] == company)
-        self.lastInvoiceNum= str(int(getNextInvoiceNumber(self.selectedCompanyInfo['Invoices'][datetime.now().year])))
-        self.invoiceNumberVar.set(self.invoiceNumber + '-' + self.invoiceYear[-2:])
+        if datetime.now().year not in self.selectedCompanyInfo['Invoices']:
+            self.selectedCompanyInfo['Invoices'].setdefault(datetime.now().year, [])
+        self.invoiceNumber= str(int(getNextInvoiceNumber(self.selectedCompanyInfo['Invoices'][datetime.now().year])))
+        self.invoiceNumberberVar.set(self.invoiceNumber + '-' + self.invoiceYear[-2:])
+        self.invoicePath.set(self.selectedCompanyInfo['Path'])
 
     def updateReceiverData(self, receiver):
         self.selectedReceiverInfo = next(x for x in self.receiversData if x['Naziv'] == receiver)
@@ -435,8 +447,8 @@ class invoiceDialog:
         #this is the invoice number field for current invoice
         invoiceNumberFrame = tk.Frame(self.container)
         invoiceNumberFrame.pack(fill='both', expand=True)
-        ttk.Label(self.invoiceNumberFrame, text='Broj Fakture:').pack(padx=20, anchor='w')
-        invoiceNumberEntry = tk.Entry(self.invoiceNumberFrame, textvariable=self.invoiceNumberVar)
+        ttk.Label(self.invoiceNumberberFrame, text='Broj Fakture:').pack(padx=20, anchor='w')
+        invoiceNumberEntry = tk.Entry(self.invoiceNumberberFrame, textvariable=self.invoiceNumberberVar)
         invoiceNumberEntry.pack(pady=10, padx=22, fill='both', expand=True)
 
         #products drop down list, as well as options to add it to currently selected products

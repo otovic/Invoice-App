@@ -20,6 +20,8 @@ class FinancialDialog():
         self.selectedYear = tk.StringVar()
         self.selectedYear.set(self.years[0])
 
+        self.yearsDD = None
+
         self.totalRevenue = sum([sum(x) for x in self.financialData[self.selectedCompany.get()][int(self.selectedYear.get())].values()])
         self.totalRevenue = f'{self.totalRevenue:,.2f} RSD'.replace(',', ' ')
 
@@ -40,9 +42,21 @@ class FinancialDialog():
     def updateSelectedCompany(self, company):
         self.selectedCompany.set(company)
         self.years = [x for x in self.financialData[self.selectedCompany.get()].keys()]
+        self.selectedYear.set(self.years[0])
+        menu = self.yearsDD['menu']
+        menu.delete(0, 'end')
+
+        for x in self.years:
+            menu.add_command(label=x, command=lambda y=x: self.updateSelectedYear(y))
+
+        self.yearsDD.configure(menu=menu)
+        self.totalRevenue = sum([sum(x) for x in self.financialData[self.selectedCompany.get()][int(self.selectedYear.get())].values()])
+        self.totalRevenue = f'{self.totalRevenue:,.2f} RSD'.replace(',', ' ')
+        self.lbl.configure(text=f"Ukupan promet: {self.totalRevenue}")
 
     def updateSelectedYear(self, year):
         self.selectedYear.set(year)
+        print(f"{year} +    pet")
         self.totalRevenue = sum([sum(x) for x in self.financialData[self.selectedCompany.get()][int(self.selectedYear.get())].values()])
         self.totalRevenue = f'{self.totalRevenue:,.2f} RSD'.replace(',', ' ')
         self.lbl.configure(text=f"Ukupan promet: {self.totalRevenue}")
@@ -82,9 +96,9 @@ class FinancialDialog():
         companiesDropDown.pack(padx=20, anchor="w")
 
         ttk.Label(self.yearsFrame, text='Godina:').pack(padx=20, anchor='w')
-        yearsDropDown = tk.OptionMenu(self.yearsFrame, self.selectedYear, *self.years, command=self.updateSelectedYear)
-        yearsDropDown.configure(width=30)
-        yearsDropDown.pack(padx=20, anchor="w")
+        self.yearsDD = tk.OptionMenu(self.yearsFrame, self.selectedYear, *self.years, command=self.updateSelectedYear)
+        self.yearsDD.configure(width=30)
+        self.yearsDD.pack(padx=20, anchor="w")
         lbl = ttk.Label(self.totalRevenueFrame, text=f"Ukupan promet: {self.totalRevenue}")
         lbl.pack()
         self.lbl = lbl

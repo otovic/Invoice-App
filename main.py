@@ -4,7 +4,7 @@ from tkinter import ttk
 #create root app (window)
 rootApp = tk.Tk()
 rootApp.title("Ottoshop")
-rootApp.geometry("300x400")
+rootApp.geometry("300x450")
 
 invoiceDialogObj = None
 
@@ -22,6 +22,14 @@ def showFinancialDialog():
     financialDialogObj = FinancialDialog(rootApp)
     financialDialogObj.showDialog()
 
+addCompanyDialogObj = None
+
+def showAddCompanyDialog():
+    from addcompany import addCompanyDialog
+    global addCompanyDialogObj
+    addCompanyDialogObj = addCompanyDialog(rootApp)
+    addCompanyDialogObj.showAddCompanyDialog()
+
 def closeApp():
     rootApp.quit()                                                               
 #change window icon
@@ -32,7 +40,8 @@ ttk.Button(rootApp, text='Fakturisanje', command=showInvoiceDialog, width=20).pa
 ttk.Button(rootApp, text='Finansijski Izvestaj', command=showFinancialDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Bar Kodovi', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Etikete', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
-ttk.Button(rootApp, text='Dodaj Firmu', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
+ttk.Button(rootApp, text='Dodaj Firmu', command=showAddCompanyDialog, width=20).pack(padx=30, pady=10)
+ttk.Button(rootApp, text='Dodaj Klijenta', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Proizvod', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Izmeni Proizvod', command=closeApp, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Izadji', command=closeApp, width=10).pack(padx=30, pady=30)
