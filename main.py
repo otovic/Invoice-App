@@ -46,6 +46,14 @@ def showAddProductDialog():
     addProductDialogObj = AddProductDialog(rootApp)
     addProductDialogObj.showAddProductDialog()
 
+changeProductDialogObj = None
+
+def showChangeProductDialog():
+    from changeproduct import ChangeProductDialog
+    global changeProductDialogObj
+    changeProductDialogObj = ChangeProductDialog(rootApp)
+    changeProductDialogObj.render_dialog()
+
 def closeApp():
     rootApp.quit()                                                               
 #change window icon
@@ -59,7 +67,7 @@ ttk.Button(rootApp, text='Etikete', command=showInvoiceDialog, width=20).pack(pa
 ttk.Button(rootApp, text='Dodaj Firmu', command=showAddCompanyDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Klijenta', command=showAddClientDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Proizvod', command=showAddProductDialog, width=20).pack(padx=30, pady=10)
-ttk.Button(rootApp, text='Izmeni Proizvod', command=closeApp, width=20).pack(padx=30, pady=10)
+ttk.Button(rootApp, text='Izmeni Proizvod', command=showChangeProductDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Izadji', command=closeApp, width=10).pack(padx=30, pady=30)
 
 # #initiate main form
