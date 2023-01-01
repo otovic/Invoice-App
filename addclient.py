@@ -2,15 +2,6 @@ from util import readData, updateData
 import tkinter as tk
 from tkinter import ttk
 
-# receivers = [{
-#     'Naziv': '011',
-#     'Ime': 'SOUVENIR SHOP',
-#     'Maticni': '20121122',
-#     'Grad': 'Beograd (Novi Beograd)',
-#     'Ulica': 'Gandijeva 99B',
-#     'PIB': '104223365'
-# }]
-
 class addClientDialog():
     def __init__(self, root) -> None:
         self.data = readData('data/receivers.pickle')
@@ -43,7 +34,6 @@ class addClientDialog():
     
     def __del__(self):
         print('Otiso sam')
-
 
     def Submit(self):
         if self.nazivFirme.get() != '' and self.imeFirme.get() != '' and self.maticniBrojFirme.get() != '' and self.gradFirme.get() != '' and self.ulicaFirme.get() != '' and self.PIBFirme.get() != '':

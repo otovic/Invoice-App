@@ -38,9 +38,6 @@ class addCompanyDialog():
         self.submitFrame= tk.Frame(self.container)
         self.submitFrame.pack(pady=0, padx=15, fill='both', expand=True)
 
-    def pro(self):
-        print(self.data)
-    
     def Submit(self):
         company = {
             'Ime': self.companyName.get(),
