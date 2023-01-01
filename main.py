@@ -62,6 +62,14 @@ def showBarCodeDialog():
     barCodeDialogObj = BarCodeDialog(rootApp)
     barCodeDialogObj.renderDialog()
 
+declarationDialogObj = None
+
+def showDeclarationDialog():
+    from printdeclaration import PrintDeclaration
+    global declarationDialogObj
+    declarationDialogObj = PrintDeclaration(rootApp)
+    declarationDialogObj.render_dialog()
+
 def closeApp():
     rootApp.quit()                                                               
 #change window icon
@@ -71,7 +79,7 @@ rootApp.wm_iconphoto(True, icon)
 ttk.Button(rootApp, text='Fakturisanje', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Finansijski Izvestaj', command=showFinancialDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Bar Kodovi', command=showBarCodeDialog, width=20).pack(padx=30, pady=10)
-ttk.Button(rootApp, text='Etikete', command=showInvoiceDialog, width=20).pack(padx=30, pady=10)
+ttk.Button(rootApp, text='Etikete', command=showDeclarationDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Firmu', command=showAddCompanyDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Klijenta', command=showAddClientDialog, width=20).pack(padx=30, pady=10)
 ttk.Button(rootApp, text='Dodaj Proizvod', command=showAddProductDialog, width=20).pack(padx=30, pady=10)
