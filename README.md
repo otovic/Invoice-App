@@ -1,4 +1,4 @@
-#A very simple Invoice App made with Python.
+# A very simple Invoice App made with Python.
 This is a simple desktop application that uses Python's tkinter library to construct GUI.
 
 #Before you can use this code you need to install few modules:
