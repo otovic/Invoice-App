@@ -1,7 +1,6 @@
-from util import readData, updateData
 import tkinter as tk
 from tkinter import ttk, filedialog
-from docx import Document, shared
+from docx import Document
 
 class BarCodeDialog():
     def __init__(self, root):
