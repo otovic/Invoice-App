@@ -29,4 +29,5 @@ printing. NOTE: This is designed for clothing company, so you will see labels wi
 
 This is all the functionality in the app.
 
-# NOTE: I still need to polish this app, all the functionality works but there are few tweaks left i need to do. The app is also on Serbian language.
+# NOTE: 
+I still need to polish this app, all the functionality works but there are few tweaks left i need to do. The app is also on Serbian language.
